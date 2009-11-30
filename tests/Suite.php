@@ -11,6 +11,8 @@ require_once 'PHPUnit/Framework/TestCase.php';
 
 require_once 'Zrails/Db/Facade/Replication.php';
 require_once 'Test/Zrails/Db/Facade/Replication.php';
+require_once 'Zrails/Db/Facade/Cluster.php';
+require_once 'Test/Zrails/Db/Facade/Cluster.php';
 
 class Suite extends PHPUnit_Framework_TestSuite
 {
@@ -18,6 +20,8 @@ class Suite extends PHPUnit_Framework_TestSuite
 	  {
 		    $this->setName('Suite Facade Replication');
 		    $this->addTestSuite('Test_Zrails_Db_Facade_Replication');
+		    $this->setName('Suite Facade Cluster');
+		    $this->addTestSuite('Test_Zrails_Db_Facade_Cluster');
     }
 
 	  public static function suite() {
