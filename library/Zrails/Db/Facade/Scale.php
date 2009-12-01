@@ -101,11 +101,10 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
 
         //configure shards
         foreach ($options['shards'] as $shard) {
-            if ($shard instanceof Zend_Db_Adapter_Abstract) {
-                $this->_shards[] = $shard;
-                continue;
+            if (!($shard instanceof Zend_Db_Adapter_Abstract)) {
+                $shard = Zend_Db::factory(new Zend_Config($shard));
             }
-            $this->_shards[] = Zend_Db::factory(new Zend_Config($shard));
+            $this->_shards[] = $shard;
         }
         $this->_countShards = count($this->_shards);
 
@@ -223,7 +222,6 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
                     return $this->_setConnectionDbByQuery("$_sql", $table);
                 } catch (Zend_Db_Adapter_Exception $E) {}
             }
-            if ($scale_field_rule_exists) return true;
             throw new Zend_Db_Adapter_Exception("Unknow shard number in query [$sql]");
         }
 
@@ -420,10 +418,7 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
      */
     public function lastInsertId($tableName = null, $primaryKey = null)
     {
-        if ($this->_lastInsertId) {
-            return $this->_lastInsertId;
-        }
-        return $this->__call(__FUNCTION__, array($table, $primaryKey));
+        return $this->_lastInsertId;
     }
 
 
@@ -477,17 +472,26 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
     /**
      * Begin a transaction.
      */
-    protected function _beginTransaction() {}
+    protected function _beginTransaction()
+    {
+        throw new Zend_Db_Adapter_Exception('Illegal call _beginTransaction');
+    }
 
     /**
      * Commit a transaction.
      */
-    protected function _commit() {}
+    protected function _commit()
+    {
+        throw new Zend_Db_Adapter_Exception('Illegal call _commit');
+    }
 
     /**
      * Roll-back a transaction.
      */
-    protected function _rollBack() {}
+    protected function _rollBack()
+    {
+        throw new Zend_Db_Adapter_Exception('Illegal call _rollBack');
+    }
 
     /**
      * Set the fetch mode.

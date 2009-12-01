@@ -7,7 +7,7 @@ class Zrails_Db_Facade_ScaleTest extends PHPUnit_Framework_TestCase
 {
     /**
      * Db horisontal scalable adapter
-     * @var Core_Db_Adpater_Scale
+     * @var Zrails_Db_Facade_Scale
      */
     protected $_db = null;
 
@@ -203,10 +203,53 @@ class Zrails_Db_Facade_ScaleTest extends PHPUnit_Framework_TestCase
             "name" => "test-insert"
         ));
         $id = $this->_db->lastInsertId();
-
         $User = $this->_users->find($id)->current();
         $this->assertEquals($User->id, $id);
         $this->assertEquals($User->name, "test-insert");
+    }
+
+    public function testListTables()
+    {
+        $this->assertEquals($this->_db->listTables(), array('users'));
+    }
+
+    public function testGetIterator()
+    {
+        $iterator = $this->_db->getIterator();
+        $this->assertEquals(get_class($iterator), 'ArrayObject');
+        $this->assertEquals(count($iterator), 2);
+        foreach ($iterator as $connection) {
+            $this->assertTrue($connection instanceof Zend_Db_Adapter_Abstract);
+        }
+    }
+
+    public function testGetServerVersion()
+    {
+        $this->assertEquals($this->_db->getServerVersion(), '5.1.37');
+    }
+
+    public function testSupportParametr()
+    {
+        $this->assertTrue($this->_db->supportsParameters('INTEGER'));
+    }
+
+    public function testCloseConnection()
+    {
+        $this->assertNull($this->_db->closeConnection());
+    }
+
+    public function testSetFetchMode()
+    {
+        $this->_db->setFetchMode(Zend_Db::FETCH_NUM);
+        foreach ($this->_db as $connection) {
+            $this->assertEquals($connection->getFetchMode(), Zend_Db::FETCH_NUM);
+        }
+    }
+
+    public function testPrepare()
+    {
+        $stmp = $this->_db->prepare('SELECT * FROM users WHERE id=?');
+        var_dump($stmp);
     }
 }
 
