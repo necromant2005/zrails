@@ -1,6 +1,6 @@
 <phpunit colors="true" bootstrap="bootstrap.php">
     <testsuite name="Zrails_Db_Facade_ScaleTest">
-        <directory>./Zrails/Db/Facade/</directory>
+        <directory>./</directory>
     </testsuite>
     <logging>
       <log type="coverage-html" target="/tmp/log/report" charset="UTF-8"

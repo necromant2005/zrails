@@ -1,5 +1,7 @@
 <?php
-class Test_Zrails_Db_Facade_Cluster extends PHPUnit_Framework_TestCase
+require_once 'Zrails/Db/Facade/Cluster.php';
+
+class Zrails_Db_Facade_ClusterTest extends PHPUnit_Framework_TestCase
 {
     private $db = null;
 

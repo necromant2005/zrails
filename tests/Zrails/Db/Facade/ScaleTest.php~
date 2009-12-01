@@ -1,5 +1,5 @@
 <?php
-require_once '../library/Zrails/Db/Facade/Scale.php';
+require_once 'Zrails/Db/Facade/Scale.php';
 
 require_once './Zrails/Db/Facade/Scale/_files/tables/Users.php';
 
@@ -249,7 +249,7 @@ class Zrails_Db_Facade_ScaleTest extends PHPUnit_Framework_TestCase
     public function testPrepare()
     {
         $stmp = $this->_db->prepare('SELECT * FROM users WHERE id=?');
-        var_dump($stmp);
+        $this->assertEquals(get_class($stmp), 'Zend_Db_Statement_Pdo');
     }
 }
 

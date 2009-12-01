@@ -1,5 +1,7 @@
 <?php
-class Test_Zrails_Db_Document_Adapter_Couchdb extends PHPUnit_Framework_TestCase
+require_once 'Zrails/Db/Document/Adapter/Couchdb.php';
+
+class Zrails_Db_Document_Adapter_CouchdbTest extends PHPUnit_Framework_TestCase
 {
     private $db = null;
 

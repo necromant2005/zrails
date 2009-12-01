@@ -1,7 +1,7 @@
 <?php
-require_once '../library/Zrails/Db/Facade/Scale.php';
+require_once 'Zrails/Db/Facade/Scale.php';
 
-require_once './Zrails/Db/Facade/Scale/_files/tables/Users.php';
+require_once 'Zrails/Db/Facade/Scale/_files/tables/Users.php';
 
 class Zrails_Db_Facade_ScaleTest extends PHPUnit_Framework_TestCase
 {

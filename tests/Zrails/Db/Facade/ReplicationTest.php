@@ -1,5 +1,7 @@
 <?php
-class Test_Zrails_Db_Facade_Replication extends PHPUnit_Framework_TestCase
+require_once 'Zrails/Db/Facade/Replication.php';
+
+class Zrails_Db_Facade_ReplicationTest extends PHPUnit_Framework_TestCase
 {
     private $db = null;
 
