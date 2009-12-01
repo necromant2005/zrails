@@ -74,6 +74,19 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
         }
     }
 
+    /**
+     * Special method for catch all non exist method
+     * Work as 1 enter point for all methods call
+     *
+     * @param $method string; call method name
+     * @param $args array; input arguments array
+     * @return mixed
+     */
+    public function __call($method, $args)
+    {
+        $this->_connect();
+        return call_user_func_array(array($this->_connection, $method), $args);
+    }
 
     /**
      * Creates a connection to the database.
@@ -115,8 +128,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function closeConnection()
     {
-        $this->_connect();
-        $this->_connection->closeConnection();
+        return $this->__call(__FUNCTION__, array());
     }
 
     /**
@@ -140,8 +152,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function query($sql, $bind = array())
     {
-        $this->_connect();
-        return $this->_connection->query($sql, $bind);
+        return $this->__call(__FUNCTION__, array($sql, $bind));
     }
 
 
@@ -156,8 +167,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function listTables()
     {
-        $this->_connect();
-        return $this->_connection->listTables();
+        return $this->__call(__FUNCTION__, array());
     }
 
     /**
@@ -189,8 +199,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function describeTable($tableName, $schemaName = null)
     {
-        $this->_connect();
-        $this->_connection->describeTable($tableName, $schemaName);
+        return $this->__call(__FUNCTION__, array($tableName, $schemaName));
     }
 
 
@@ -202,8 +211,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function prepare($sql)
     {
-        $this->_connect();
-        return $this->_connection->prepare($sql);
+        return $this->__call(__FUNCTION__, array($sql));
     }
 
     /**
@@ -222,8 +230,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function lastInsertId($tableName = null, $primaryKey = null)
     {
-        $this->_connect();
-        return $this->_connection->lastInsertId($tableName, $primaryKey);
+        return $this->__call(__FUNCTION__, array($tableName, $primaryKey));
     }
 
     /**
@@ -267,8 +274,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function limit($sql, $count, $offset = 0)
     {
-        $this->_connect();
-        return $this->_connection->limit($sql, $count, $offset);
+        return $this->__call(__FUNCTION__, array());
     }
 
     /**
@@ -279,8 +285,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function supportsParameters($type)
     {
-        $this->_connect();
-        return $this->_connection->supportsParameters($type);
+        return $this->__call(__FUNCTION__, array($type));
     }
 
     /**
@@ -290,8 +295,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function getServerVersion()
     {
-        $this->_connect();
-        return $this->_connection->getServerVersion();
+        return $this->__call(__FUNCTION__, array());
     }
 
 
@@ -308,8 +312,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function beginTransaction()
     {
-        $this->_connect();
-        return $this->_connection->beginTransaction();
+        return $this->__call(__FUNCTION__, array());
     }
 
     /**
@@ -319,8 +322,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function commit()
     {
-        $this->_connect();
-        return $this->_connection->commit();
+        return $this->__call(__FUNCTION__, array());
     }
 
     /**
@@ -330,8 +332,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function rollBack()
     {
-        $this->_connect();
-        return $this->_connection->rollBack();
+        return $this->__call(__FUNCTION__, array());
     }
 
 
@@ -342,8 +343,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function select()
     {
-        $this->_connect();
-        return $this->_connection->select();
+        return $this->__call(__FUNCTION__, array());
     }
 
     /**
@@ -358,8 +358,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function quote($value, $type = null)
     {
-        $this->_connect();
-        return $this->_connection->quote($value, $type);
+        return $this->__call(__FUNCTION__, array($value, $type));
     }
 
     /**
@@ -383,8 +382,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function quoteInto($text, $value, $type = null, $count = null)
     {
-        $this->_connect();
-        return $this->_connection->quoteInto($text, $value, $type, $count);
+        return $this->__call(__FUNCTION__, array($text, $value, $type, $count));
     }
 
    /**
@@ -411,8 +409,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function quoteIdentifier($ident, $auto=false)
     {
-        $this->_connect();
-        return $this->_connection->quoteIdentifier($ident, $auto);
+        return $this->__call(__FUNCTION__, array($ident, $auto));
     }
 
     /**
@@ -425,8 +422,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function quoteColumnAs($ident, $alias, $auto=false)
     {
-        $this->_connect();
-        return $this->_connection->quoteColumnAs($ident, $alias, $auto);
+        return $this->__call(__FUNCTION__, array($ident, $alias, $auto));
     }
 
     /**
@@ -439,8 +435,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function quoteTableAs($ident, $alias = null, $auto = false)
     {
-        $this->_connect();
-        return $this->_connection->quoteTableAs($ident, $alias, $auto);
+        return $this->__call(__FUNCTION__, array($ident, $alias, $auto));
     }
 
     /**
@@ -450,8 +445,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function getQuoteIdentifierSymbol()
     {
-        $this->_connect();
-        return $this->_connection->getQuoteIdentifierSymbol();
+        return $this->__call(__FUNCTION__, array());
     }
 
     /**
@@ -464,8 +458,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function lastSequenceId($sequenceName)
     {
-        $this->_connect();
-        return $this->_connection->lastSequenceId($sequenceName);
+        return $this->__call(__FUNCTION__, array($sequenceName));
     }
 
     /**
@@ -478,8 +471,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function nextSequenceId($sequenceName)
     {
-        $this->_connect();
-        return $this->_connection->nextSequenceId($sequenceName);
+        return $this->__call(__FUNCTION__, array($sequenceName));
     }
 
     /**
@@ -496,8 +488,7 @@ class Zrails_Db_Facade_Cluster extends Zend_Db_Adapter_Abstract implements Itera
      */
     public function foldCase($key)
     {
-        $this->_connect();
-        return $this->_connection->foldCase($key);
+        return $this->__call(__FUNCTION__, array($key));
     }
 }
 
