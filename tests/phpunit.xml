@@ -1,0 +1,6 @@
+<phpunit colors="true" bootstrap="bootstrap.php">
+    <testsuite name="Zrails_Db_Facade_ScaleTest">
+        <directory>./Zrails/Db/Facade/</directory>
+    </testsuite>
+</phpunit>
+
