@@ -10,6 +10,10 @@ require_once 'Zend/Loader.php';
  */
 require_once 'Zend/Db/Adapter/Abstract.php';
 
+/**
+ ** @see Zend_Db_Adapter_Exception
+ */
+require_once 'Zend/Db/Adapter/Exception.php';
 
 /**
  * Class for connecting to master-slave databases and performing common operations.
@@ -226,7 +230,7 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
         $Strategy = $this->_tables_scale_strategies[$table];
 
         $symbol = $this->getQuoteIdentifierSymbol();
-        if (!preg_match("~$symbol*".$Strategy->getField()."$symbol*\s*=\s*([^ \)]+)~", "$sql", $match)) {
+        if (!preg_match("~$symbol*" . $Strategy->getField() . "$symbol*\s*=\s*([^ \)]+)~", "$sql", $match)) {
             throw new Zend_Db_Adapter_Exception("Unknow shard number in query [$sql]");
         }
         $value = preg_replace("[^a-z0-9\-]", "", $match[1]);

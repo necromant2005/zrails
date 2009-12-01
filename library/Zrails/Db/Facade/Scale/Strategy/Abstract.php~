@@ -1,0 +1,88 @@
+<?php
+/**
+ * Abstract class for stratery of scale.
+ *
+ * @category   Zrails
+ * @package    Zrails_Db
+ * @subpackage Adapter
+ * @author     necromant2005@gmail.com
+ * @copyright  necromant2005 (http://necromant2005.blogspot.com/)
+ * @license    http://framework.zend.com/license/new-bsd     New BSD License
+ */
+abstract class Zrails_Db_Facade_Scale_Strategy_Abstract
+{
+    /**
+     * Scale adapter
+     *
+     * @var Zrails_Db_Facade_Scale
+     */
+    protected $_db = null;
+
+    /**
+     * Table name
+     *
+     * @var string
+     */
+    protected $_table = "";
+
+    /**
+     * Name field who used in scale algo
+     *
+     * @var string
+     */
+    protected $_field = "";
+
+    /**
+     * Build strategy object
+     *
+     * @param Core_Db_Adapter_Scale $Adapter
+     */
+    public function __construct(Zrails_Db_Facade_Scale $db)
+    {
+        $this->_db = $db;
+    }
+
+    /**
+     * Setup table name
+     *
+     * @param string $table
+     */
+    public function setTable($table)
+    {
+        $this->_table = $table;
+    }
+
+    /**
+     * Setup scale field name
+     *
+     * @param string $field
+     */
+    public function setField($field)
+    {
+        $this->_field = $field;
+    }
+
+    /**
+     * Get scale field
+     *
+     * @return string
+     */
+    public function getField()
+    {
+        return $this->_field;
+    }
+
+    /**
+     *  Get shard conncetion by value
+     *
+     * @param string $value
+     * @return Zend_Db_Adapter_Abstract
+     */
+    public function getShard($value)
+    {
+        return $this->_db->getShard($this->getShardName($value));
+    }
+
+    abstract public function getShardName($name);
+}
+

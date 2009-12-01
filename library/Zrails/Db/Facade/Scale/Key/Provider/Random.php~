@@ -32,7 +32,7 @@ class Zrails_Db_Facade_Scale_Key_Provider_Random extends Zrails_Db_Facade_Scale_
                 ->select()
                 ->from($this->_table)
                 ->where($this->_db->quoteInto("$field=?", $uid));
-        } while($this->_db->query("$dbSelect")->rowCount());
+        } while($this->_Adapter->query("$dbSelect")->rowCount());
         return $uid;
     }
 }

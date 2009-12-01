@@ -1,6 +1,6 @@
 <?php
 /**
- * Abstract class for stratery of scale.
+ * Abstract class for scale key prodiver generator key
  *
  * @category   Zrails
  * @package    Zrails_Db
@@ -9,7 +9,7 @@
  * @copyright  necromant2005 (http://necromant2005.blogspot.com/)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-abstract class Zrails_Db_Facade_Scale_Strategy_Abstract
+abstract class Zrails_Db_Facade_Scale_Key_Provider_Abstract
 {
     /**
      * Scale adapter
@@ -35,7 +35,7 @@ abstract class Zrails_Db_Facade_Scale_Strategy_Abstract
     /**
      * Build strategy object
      *
-     * @param Core_Db_Adapter_Scale $Adapter
+     * @param Zrails_Db_Facade_Scale $db
      */
     public function __construct(Zrails_Db_Facade_Scale $db)
     {
@@ -71,18 +71,5 @@ abstract class Zrails_Db_Facade_Scale_Strategy_Abstract
     {
         return $this->_field;
     }
-
-    /**
-     *  Get shard conncetion by value
-     *
-     * @param string $value
-     * @return Zend_Db_Adapter_Abstract
-     */
-    public function getShard($value)
-    {
-        return $this->_db->getShard($this->getShardName($value));
-    }
-
-    abstract public function getShardName($name);
 }
 

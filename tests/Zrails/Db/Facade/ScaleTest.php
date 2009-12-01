@@ -1,7 +1,7 @@
 <?php
 require_once '../library/Zrails/Db/Facade/Scale.php';
 
-require_once './Zrails/Db/Facade/_files/UsersTable.php';
+require_once './Zrails/Db/Facade/Scale/_files/tables/Users.php';
 
 class Zrails_Db_Facade_ScaleTest extends PHPUnit_Framework_TestCase
 {
@@ -34,7 +34,7 @@ class Zrails_Db_Facade_ScaleTest extends PHPUnit_Framework_TestCase
                          "host"     => "127.0.0.1",
                          "username" => "root",
                          "password" => "",
-                         "dbname"   => "test1",
+                         "dbname"   => "test0",
                     )
                 ),
                 1 => Zend_Db::factory("Pdo_Mysql", array(
@@ -45,29 +45,25 @@ class Zrails_Db_Facade_ScaleTest extends PHPUnit_Framework_TestCase
                     )
                 ),
         )));
-        $this->_users = new UsersTable($this->_db);
+
+        $this->_db->delete('users');
+        $this->_users = new Users($this->_db);
     }
 
-
-    public function testFetchOne()
+    public function testInsertDbWithID()
     {
-        foreach(array(1=>"peter", 2=>"kris", 4=>"jo") as $id=>$name) {
-            $UsersRowset = $this->_users->find($id);
-            $User = $UsersRowset->current();
-            $this->assertEquals($User->id, $id);
-            $this->assertEquals($User->name, $name);
-        }
+        $affectedRows = $this->_db->insert('users', array(
+            "id"   => 5,
+            "name" => "test-insert"
+        ));
+        $this->assertEquals($affectedRows, 1);
+
+        $User = $this->_users->find(5)->current();
+        $this->assertEquals($User->id, 5);
+        $this->assertEquals($User->name, "test-insert");
     }
 
-    public function testFetchWithoutShard()
-    {
-        try {
-            $this->_users->fetchAll("1");
-        } catch (Zend_Db_Adapter_Exception $E) {}
-        $this->assertIsA($E, "Zend_Db_Adapter_Exception");
-    }
-
-    public function testInsertWithID()
+    public function testInsertModelWithID()
     {
         $this->_users->insert(array(
             "id"   => 5,
@@ -79,8 +75,31 @@ class Zrails_Db_Facade_ScaleTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($User->name, "test-insert");
     }
 
+    public function testFetchOne()
+    {
+        foreach(array(1=>"peter", 2=>"kris", 4=>"jo") as $id=>$name) {
+            $this->_db->insert('users', array('id'=>$id, 'name'=>$name));
+            $User = $this->_users->find($id)->current();
+            $this->assertEquals($User->id, $id);
+            $this->assertEquals($User->name, $name);
+        }
+    }
+
+    public function testFetchWithoutShard()
+    {
+        try {
+            $this->_users->fetchAll("1");
+        } catch (Zend_Db_Adapter_Exception $E) {}
+        $this->assertEquals(get_class($E), "Zend_Db_Adapter_Exception");
+    }
+
+
     public function testDelete()
     {
+        $this->_users->insert(array(
+            "id"   => 1,
+            "name" => "test-insert"
+        ));
         $User = $this->_users->find(1)->current();
         $User->delete();
         $UsersRows = $this->_users->find(1);
@@ -89,6 +108,10 @@ class Zrails_Db_Facade_ScaleTest extends PHPUnit_Framework_TestCase
 
     public function testUpdateWithoutMigrateObject()
     {
+        $this->_users->insert(array(
+            "id"   => 4,
+            "name" => "jo"
+        ));
         $User = $this->_users->find(4)->current();
         $User->name = "joseph";
         $User->save();
@@ -96,6 +119,10 @@ class Zrails_Db_Facade_ScaleTest extends PHPUnit_Framework_TestCase
 
     public function testUpdateWithMigrateObject()
     {
+        $this->_users->insert(array(
+            "id"   => 1,
+            "name" => "jo"
+        ));
         $User = $this->_users->find(1)->current();
         $User->id = 7;
         $User->save();
