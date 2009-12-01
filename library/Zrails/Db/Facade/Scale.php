@@ -39,14 +39,14 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
      *
      * @var int
      */
-    protected $_shards_count = 0;
+    protected $_countShards = 0;
 
     /**
      * Collection of scale strategies for tables
      *
      * @var array
      */
-    protected $_tables_scale_strategies = array();
+    protected $_tablesScaleStrategies = array();
 
 
     /**
@@ -54,7 +54,7 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
      *
      * @var array
      */
-    protected $_tables_primary_generate_stategies = array();
+    protected $_tablesScaleKeyProviders = array();
 
 
     /**
@@ -69,7 +69,7 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
      *
      * @var int|string
      */
-    protected $_last_insert_id = 0;
+    protected $_lastInsertId = 0;
 
     /**
      * Construct Db Adapter Scale Adapter
@@ -102,7 +102,7 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
 
 
         $this->_shards = $options['shards'];
-        $this->_shards_count = count($this->_shards);
+        $this->_countShards = count($this->_shards);
 
         foreach ($options['tables'] as $table=>$table_options) {
             $nameScaleStrategy = $table_options["scale"]["strategy"];
@@ -110,7 +110,7 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
             $Strategy = new $nameScaleStrategy($this);
             $Strategy->setTable($table);
             $Strategy->setField($table_options["scale"]["field"]);
-            $this->_tables_scale_strategies[$table] = $Strategy;
+            $this->_tablesScaleStrategies[$table] = $Strategy;
 
             if ($table_options["primary"]["autogenerate"]) {
                 $nameScaleKeyProvider = $table_options["primary"]["provider"];
@@ -118,7 +118,7 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
                 $Strategy = new $nameScaleKeyProvider($this);
                 $Strategy->setTable($table);
                 $Strategy->setField($table_options["primary"]["field"]);
-                $this->_tables_primary_generate_stategies[$table] = $Strategy;
+                $this->_tablesScaleKeyProviders[$table] = $Strategy;
             }
         }
 
@@ -130,45 +130,45 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
 
     public function getCountShards()
     {
-        return $this->_shards_count;
+        return $this->_countShards;
     }
 
     /**
      * Get scale strategy for table
      *
      * @param string $table
-     * @throw Core_Db_Adapter_Scale_Exception
+     * @throw Zend_Db_Adapter_Exception
      * @return Core_Db_Adapter_Scale_Strategy
      */
     public function getScaleStrategy($table)
     {
-        if (!array_key_exists($table, $this->_tables_scale_strategies)) throw new Core_Db_Adapter_Scale_Exception("Uknow table '$table'");
-        return $this->_tables_scale_strategies[$table];
+        if (!array_key_exists($table, $this->_tablesScaleStrategies)) throw new Zend_Db_Adapter_Exception("Uknow table '$table'");
+        return $this->_tablesScaleStrategies[$table];
     }
 
     /**
      * Get autogenerate strategy for table
      *
      * @param string $table
-     * @throw Core_Db_Adapter_Scale_Exception
+     * @throw Zend_Db_Adapter_Exception
      * @return Core_Db_Adapter_Scale_Primary_Generate_Strategy
      */
-    public function getPrimaryGenerateStrategy($table)
+    public function getScaleKeyProvider($table)
     {
-        if (!array_key_exists($table, $this->_tables_primary_generate_stategies)) throw new Core_Db_Adapter_Scale_Exception("Uknow primary for table '$table'");
-        return $this->_tables_primary_generate_stategies[$table];
+        if (!array_key_exists($table, $this->_tablesScaleKeyProviders)) throw new Zend_Db_Adapter_Exception("Uknow primary for table '$table'");
+        return $this->_tablesScaleKeyProviders[$table];
     }
 
     /**
      * Get shard connection by name
      *
      * @param string $name
-     * @throw Core_Db_Adapter_Scale_Exception
+     * @throw Zend_Db_Adapter_Exception
      * @return Zend_Db_Adapter_Abstract
      */
     public function getShard($name)
     {
-        if (!array_key_exists($name, $this->_shards)) throw new Core_Db_Adapter_Scale_Exception("Uknknow shard name '$name'");
+        if (!array_key_exists($name, $this->_shards)) throw new Zend_Db_Adapter_Exception("Uknknow shard name '$name'");
         return $this->_shards[$name];
     }
 
@@ -227,7 +227,7 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
             preg_match("~from\s+([^ ]+)\s+~i", "$sql", $match_table);
             $table = preg_replace("~[^a-z0-9_]+~", "", $match_table[1]);
         }
-        $Strategy = $this->_tables_scale_strategies[$table];
+        $Strategy = $this->_tablesScaleStrategies[$table];
 
         $symbol = $this->getQuoteIdentifierSymbol();
         if (!preg_match("~$symbol*" . $Strategy->getField() . "$symbol*\s*=\s*([^ \)]+)~", "$sql", $match)) {
@@ -247,18 +247,18 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
      */
     public function insert($table, array $bind)
     {
-        $this->_last_insert_id = null;
+        $this->_lastInsertId = null;
 
         $Strategy = $this->getScaleStrategy($table);
-        $StrategyGenerate = $this->getPrimaryGenerateStrategy($table);
+        $StrategyGenerate = $this->getScaleKeyProvider($table);
 
         if (!array_key_exists($StrategyGenerate->getField(), $bind)) {
-            $this->_last_insert_id = $StrategyGenerate->getUniqueId();
-            $bind[$Strategy->getField()] = $this->_last_insert_id;
-            $this->_shard = $Strategy->getShard($this->_last_insert_id);
+            $this->_lastInsertId = $StrategyGenerate->getUniqueId();
+            $bind[$Strategy->getField()] = $this->_lastInsertId;
+            $this->_shard = $Strategy->getShard($this->_lastInsertId);
         }
 
-        if (!array_key_exists($Strategy->getField(), $bind)) throw new Core_Db_Adapter_Scale_Exception('Dissable insert without scale field value');
+        if (!array_key_exists($Strategy->getField(), $bind)) throw new Zend_Db_Adapter_Exception('Dissable insert without scale field value');
         $value = $bind[$Strategy->getField()];
         $this->_shard = $Strategy->getShard($value);
 
@@ -275,7 +275,7 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
      */
     public function update($table, array $bind, $where = '')
     {
-       $Strategy = $this->_tables_scale_strategies[$table];
+       $Strategy = $this->_tablesScaleStrategies[$table];
        $symbol = $this->getQuoteIdentifierSymbol();
        $this->_setConnectionDbByQuery($where, $table);
        if (!array_key_exists($Strategy->getField(), $bind)) {
@@ -415,8 +415,8 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
      */
     public function lastInsertId($tableName = null, $primaryKey = null)
     {
-        if ($this->_last_insert_id) {
-            return $this->_last_insert_id;
+        if ($this->_lastInsertId) {
+            return $this->_lastInsertId;
         }
         return $this->__call(__FUNCTION__, array($table, $primaryKey));
     }
