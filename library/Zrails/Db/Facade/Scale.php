@@ -1,6 +1,11 @@
 <?php
 
 /**
+ ** @see Zend_Config
+ */
+require_once 'Zend/Config.php';
+
+/**
  ** @see Zend_Loader
  */
 require_once 'Zend/Loader.php';
@@ -74,7 +79,7 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
     /**
      * Construct Db Adapter Scale Adapter
      * @param $array
-     * @example new Core_Db_Adpater_Scale(array(
+     * @example new Zrails_Db_Facade_Scale(array(
      *   'tables' => array(
      *     'table_name' => array(
      *         'field'        => 'field_name',
@@ -94,10 +99,17 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
         if (empty($options['tables'])) throw new Zend_Db_Adapter_Exception("Empty options section 'tables'");
         if (empty($options['shards'])) throw new Zend_Db_Adapter_Exception("Empty options section 'shards'");
 
-
-        $this->_shards = $options['shards'];
+        //configure shards
+        foreach ($options['shards'] as $shard) {
+            if ($shard instanceof Zend_Db_Adapter_Abstract) {
+                $this->_shards[] = $shard;
+                continue;
+            }
+            $this->_shards[] = Zend_Db::factory(new Zend_Config($shard));
+        }
         $this->_countShards = count($this->_shards);
 
+        //configure tables
         foreach ($options['tables'] as $table=>$table_options) {
             // construct scale strategy for current table
             $nameScaleStrategy = $table_options["strategy"];
@@ -117,9 +129,6 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
         }
 
 
-        list($usec, $sec) = explode(' ', microtime());
-        mt_srand((float) $sec + ((float) $usec * 100000));
-        $this->_shard = $this->_shards[array_rand($this->_shards)];
     }
 
     public function getCountShards()
@@ -132,7 +141,7 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
      *
      * @param string $table
      * @throw Zend_Db_Adapter_Exception
-     * @return Core_Db_Adapter_Scale_Strategy
+     * @return Zrails_Db_Facade_Scale_Strategy_Abstract
      */
     public function getScaleStrategy($table)
     {
@@ -145,7 +154,7 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
      *
      * @param string $table
      * @throw Zend_Db_Adapter_Exception
-     * @return Core_Db_Adapter_Scale_Primary_Generate_Strategy
+     * @return Zrails_Db_Adapter_Scale_Key_Provider_Abstract
      */
     public function getScaleKeyProvider($table)
     {
@@ -176,6 +185,7 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
      */
     public function __call($method, $args)
     {
+        $this->_connect();
         return call_user_func_array(array($this->_shard, $method), $args);
     }
 
@@ -340,7 +350,8 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
 
     protected function _connect()
     {
-
+        if ($this->_shard) return;
+        $this->_shard = $this->_shards[array_rand($this->_shards)];
     }
 
     /**

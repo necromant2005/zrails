@@ -7,7 +7,7 @@ class Zrails_Db_Facade_ScaleTest extends PHPUnit_Framework_TestCase
 {
     /**
      * Db horisontal scalable adapter
-     * @var Core_Db_Adpater_Scale
+     * @var Zrails_Db_Facade_Scale
      */
     protected $_db = null;
 
@@ -24,20 +24,24 @@ class Zrails_Db_Facade_ScaleTest extends PHPUnit_Framework_TestCase
                 ),
             ),
             "shards" => array(
-                0 => Zend_Db::factory("Pdo_Mysql", array(
-                         "host"     => "127.0.0.1",
-                         "username" => "root",
-                         "password" => "",
-                         "dbname"   => "test0",
-                    )
-                ),
-                1 => Zend_Db::factory("Pdo_Mysql", array(
-                         "host"     => "127.0.0.1",
-                         "username" => "root",
-                         "password" => "",
-                         "dbname"   => "test1",
-                    )
-                ),
+                 0 => array(
+                      'adapter' => 'Pdo_Mysql',
+                      'params'  => array(
+                          'host'     => '127.0.0.1',
+                          'username' => 'root',
+                          'password' => '',
+                          'dbname'   => 'test0'
+                      )
+                  ),
+                  1 => array(
+                      'adapter' => 'Pdo_Mysql',
+                      'params'  => array(
+                          'host'     => '127.0.0.1',
+                          'username' => 'root',
+                          'password' => '',
+                          'dbname'   => 'test1'
+                      )
+                  ),
         )));
 
         $this->_db->delete('users');

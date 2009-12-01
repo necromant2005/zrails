@@ -24,20 +24,24 @@ class Zrails_Db_Facade_ScaleTest extends PHPUnit_Framework_TestCase
                 ),
             ),
             "shards" => array(
-                0 => Zend_Db::factory("Pdo_Mysql", array(
-                         "host"     => "127.0.0.1",
-                         "username" => "root",
-                         "password" => "",
-                         "dbname"   => "test0",
-                    )
-                ),
-                1 => Zend_Db::factory("Pdo_Mysql", array(
-                         "host"     => "127.0.0.1",
-                         "username" => "root",
-                         "password" => "",
-                         "dbname"   => "test1",
-                    )
-                ),
+                 0 => array(
+                      'adapter' => 'Pdo_Mysql',
+                      'params'  => array(
+                          'host'     => '127.0.0.1',
+                          'username' => 'root',
+                          'password' => '',
+                          'dbname'   => 'test0'
+                      )
+                  ),
+                  1 => array(
+                      'adapter' => 'Pdo_Mysql',
+                      'params'  => array(
+                          'host'     => '127.0.0.1',
+                          'username' => 'root',
+                          'password' => '',
+                          'dbname'   => 'test1'
+                      )
+                  ),
         )));
 
         $this->_db->delete('users');
@@ -47,6 +51,11 @@ class Zrails_Db_Facade_ScaleTest extends PHPUnit_Framework_TestCase
     public function testContShards()
     {
         $this->assertEquals($this->_db->getCountShards(), 2);
+    }
+
+    public function testIsConnected()
+    {
+        $this->assertTrue($this->_db->isConnected());
     }
 
     public function testGetScaleStrategy()

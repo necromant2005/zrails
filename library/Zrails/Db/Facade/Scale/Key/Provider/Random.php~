@@ -18,20 +18,34 @@ require_once 'Zrails/Db/Facade/Scale/Key/Provider/Abstract.php';
 class Zrails_Db_Facade_Scale_Key_Provider_Random extends Zrails_Db_Facade_Scale_Key_Provider_Abstract
 {
     /**
+     * Build strategy object
+     *
+     * @param Zrails_Db_Facade_Scale $db
+     */
+    public function __construct(Zrails_Db_Facade_Scale $db)
+    {
+        $this->_db = $db;
+
+        list($usec, $sec) = explode(' ', microtime());
+        mt_srand((float) $sec + ((float) $usec * 100000));
+        $this->_shard = $this->_shards[array_rand($this->_shards)];
+    }
+
+
+    /**
      * Generate unique id for new row in table
      *
      * @return int|string
      */
     public function getUniqueId()
     {
-        $field = $this->_db->getScaleStrategy($this->_table)->getField();
         do {
             $uid = mt_rand();
             $dbSelect =
                 $this->_db
                 ->select()
                 ->from($this->_table)
-                ->where($this->_db->quoteInto('=?', $uid));
+                ->where($this->_db->quoteInto($this->_field . '=?', $uid));
         } while($this->_db->query("$dbSelect")->rowCount());
         return $uid;
     }
