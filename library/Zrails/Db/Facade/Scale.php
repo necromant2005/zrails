@@ -99,6 +99,7 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
         $this->_countShards = count($this->_shards);
 
         foreach ($options['tables'] as $table=>$table_options) {
+            // construct scale strategy for current table
             $nameScaleStrategy = $table_options["strategy"];
             Zend_Loader::loadClass($nameScaleStrategy);
             $Strategy = new $nameScaleStrategy($this);
@@ -106,6 +107,7 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
             $Strategy->setField($table_options["field"]);
             $this->_tablesScaleStrategies[$table] = $Strategy;
 
+            // construct key provider for current table
             $nameScaleKeyProvider = $table_options["key_provider"];
             Zend_Loader::loadClass($nameScaleKeyProvider);
             $Strategy = new $nameScaleKeyProvider($this);
@@ -219,7 +221,7 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
             preg_match("~from\s+([^ ]+)\s+~i", "$sql", $match_table);
             $table = preg_replace("~[^a-z0-9_]+~", "", $match_table[1]);
         }
-        $Strategy = $this->_tablesScaleStrategies[$table];
+        $Strategy = $this->getScaleStrategy($table);
 
         $symbol = $this->getQuoteIdentifierSymbol();
         if (!preg_match("~$symbol*" . $Strategy->getField() . "$symbol*\s*=\s*([^ \)]+)~", "$sql", $match)) {
@@ -267,7 +269,7 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
      */
     public function update($table, array $bind, $where = '')
     {
-       $Strategy = $this->_tablesScaleStrategies[$table];
+       $Strategy = $this->getScaleStrategy($table);
        $symbol = $this->getQuoteIdentifierSymbol();
        $this->_setConnectionDbByQuery($where, $table);
        if (!array_key_exists($Strategy->getField(), $bind)) {
@@ -435,14 +437,20 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
      *
      * @return boolean
      */
-    public function isConnected() {}
+    public function isConnected()
+    {
+        return $this->__call(__FUNCTION__, array());
+    }
 
     /**
      * Force the connection to close.
      *
      * @return void
      */
-    public function closeConnection() {}
+    public function closeConnection()
+    {
+        return $this->__call(__FUNCTION__, array());
+    }
 
     /**
      * Prepare a statement and return a PDOStatement-like object.
@@ -450,7 +458,10 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
      * @param string|Zend_Db_Select $sql SQL query
      * @return Zend_Db_Statement|PDOStatement
      */
-    public function prepare($sql) {}
+    public function prepare($sql)
+    {
+        return $this->__call(__FUNCTION__, array($sql));
+    }
 
     /**
      * Begin a transaction.
@@ -474,7 +485,12 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
      * @return void
      * @throws Zend_Db_Adapter_Exception
      */
-    public function setFetchMode($mode) {}
+    public function setFetchMode($mode)
+    {
+        foreach ($this as $connection) {
+            $connection->setFetchMode($mode);
+        }
+    }
 
 
     /**
@@ -483,13 +499,19 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
      * @param string $type 'positional' or 'named'
      * @return bool
      */
-    public function supportsParameters($type) {}
+    public function supportsParameters($type)
+    {
+        return $this->__call(__FUNCTION__, array($type));
+    }
 
     /**
      * Retrieve server version in PHP style
      *
      * @return string
      */
-    public function getServerVersion() {}
+    public function getServerVersion()
+    {
+        return $this->__call(__FUNCTION__, array());
+    }
 }
 

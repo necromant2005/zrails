@@ -49,6 +49,11 @@ class Zrails_Db_Facade_ScaleTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->_db->getCountShards(), 2);
     }
 
+    public function testIsConnected()
+    {
+        $this->assertTrue($this->_db->isConnected());
+    }
+
     public function testGetScaleStrategy()
     {
         $strategy = $this->_db->getScaleStrategy('users');
