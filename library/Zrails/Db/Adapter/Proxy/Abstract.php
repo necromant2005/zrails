@@ -20,111 +20,8 @@ require_once 'Zend/Db/Adapter/Exception.php';
  * @copyright  necromant2005 (http://necromant2005.blogspot.com/)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class Zrails_Db_Adapter_Proxy_Abstract extends Zend_Db_Adapter_Abstract
+abstract class Zrails_Db_Adapter_Proxy_Abstract extends Zend_Db_Adapter_Abstract
 {
-
-    /**
-     * Check for config options that are mandatory.
-     * Throw exceptions if any are missing.
-     *
-     * @param array $config
-     * @throws Zend_Db_Adapter_Exception
-     */
-    protected function _checkRequiredOptions(array $config)
-    {
-        throw new Zend_Db_Adapter_Exception('illegal call ' . __FUNCTION__);
-    }
-
-
-    /**
-     * Returns the underlying database connection object or resource.
-     * If not presently connected, this initiates the connection.
-     *
-     * @return object|resource|null
-     */
-    public function getConnection()
-    {
-        return $this->__call(__FUNCTION__, array());
-    }
-
-
-    /**
-     * Returns the configuration variables in this adapter.
-     *
-     * @return array
-     */
-    public function getConfig()
-    {
-        return $this->__call(__FUNCTION__, array());
-    }
-
-
-    /**
-     * Set the adapter's profiler object.
-     *
-     * The argument may be a boolean, an associative array, an instance of
-     * Zend_Db_Profiler, or an instance of Zend_Config.
-     *
-     * A boolean argument sets the profiler to enabled if true, or disabled if
-     * false.  The profiler class is the adapter's default profiler class,
-     * Zend_Db_Profiler.
-     *
-     * An instance of Zend_Db_Profiler sets the adapter's instance to that
-     * object.  The profiler is enabled and disabled separately.
-     *
-     * An associative array argument may contain any of the keys 'enabled',
-     * 'class', and 'instance'. The 'enabled' and 'instance' keys correspond to the
-     * boolean and object types documented above. The 'class' key is used to name a
-     * class to use for a custom profiler. The class must be Zend_Db_Profiler or a
-     * subclass. The class is instantiated with no constructor arguments. The 'class'
-     * option is ignored when the 'instance' option is supplied.
-     *
-     * An object of type Zend_Config may contain the properties 'enabled', 'class', and
-     * 'instance', just as if an associative array had been passed instead.
-     *
-     * @param  Zend_Db_Profiler|Zend_Config|array|boolean $profiler
-     * @return Zend_Db_Adapter_Abstract Provides a fluent interface
-     * @throws Zend_Db_Profiler_Exception if the object instance or class specified
-     *         is not Zend_Db_Profiler or an extension of that class.
-     */
-    public function setProfiler($profiler)
-    {
-        return $this->__call(__FUNCTION__, array($profiler));
-    }
-
-
-    /**
-     * Returns the profiler for this adapter.
-     *
-     * @return Zend_Db_Profiler
-     */
-    public function getProfiler()
-    {
-        return $this->__call(__FUNCTION__, array());
-    }
-
-
-    /**
-     * Get the default statement class.
-     *
-     * @return string
-     */
-    public function getStatementClass()
-    {
-        return $this->__call(__FUNCTION__, array());
-    }
-
-
-    /**
-     * Set the default statement class.
-     *
-     * @return Zend_Db_Adapter_Abstract Fluent interface
-     */
-    public function setStatementClass($class)
-    {
-        return $this->__call(__FUNCTION__, array($class));
-    }
-
 
     /**
      * Prepares and executes an SQL statement with bound data.
@@ -536,30 +433,6 @@ class Zrails_Db_Adapter_Proxy_Abstract extends Zend_Db_Adapter_Abstract
 
 
     /**
-     * called when object is getting serialized
-     * This disconnects the DB object that cant be serialized
-     *
-     * @throws Zend_Db_Adapter_Exception
-     * @return array
-     */
-    public function __sleep()
-    {
-        return $this->__call(__FUNCTION__, array());
-    }
-
-
-    /**
-     * called when object is getting unserialized
-     *
-     * @return void
-     */
-    public function __wakeup()
-    {
-        return $this->__call(__FUNCTION__, array());
-    }
-
-
-    /**
      * Returns a list of the tables in the database.
      *
      * @return array
@@ -600,39 +473,6 @@ class Zrails_Db_Adapter_Proxy_Abstract extends Zend_Db_Adapter_Abstract
     public function describeTable($tableName, $schemaName = null)
     {
         return $this->__call(__FUNCTION__, array($tableName, $schemaName));
-    }
-
-
-    /**
-     * Creates a connection to the database.
-     *
-     * @return void
-     */
-    protected function _connect()
-    {
-        return $this->__call(__FUNCTION__, array());
-    }
-
-
-    /**
-     * Test if a connection is active
-     *
-     * @return boolean
-     */
-    public function isConnected()
-    {
-        return $this->__call(__FUNCTION__, array());
-    }
-
-
-    /**
-     * Force the connection to close.
-     *
-     * @return void
-     */
-    public function closeConnection()
-    {
-        return $this->__call(__FUNCTION__, array());
     }
 
 
@@ -743,29 +583,6 @@ class Zrails_Db_Adapter_Proxy_Abstract extends Zend_Db_Adapter_Abstract
     {
         return $this->__call(__FUNCTION__, array());
     }
-
-    /**
-     * Constructor.
-     *
-     * $config is an array of key/value pairs or an instance of Zend_Config
-     * containing configuration options.  These options are common to most adapters:
-     *
-     * dbname         => (string) The name of the database to user
-     * username       => (string) Connect to the database as this username.
-     * password       => (string) Password associated with the username.
-     * host           => (string) What host to connect to, defaults to localhost
-     *
-     * Some options are used on a case-by-case basis by adapters:
-     *
-     * port           => (string) The port of the database
-     * persistent     => (boolean) Whether to use a persistent connection or not, defaults to false
-     * protocol       => (string) The network protocol, defaults to TCPIP
-     * caseFolding    => (int) style of case-alteration used for identifiers
-     *
-     * @param  array|Zend_Config $config An array or instance of Zend_Config having configuration data
-     * @throws Zend_Db_Adapter_Exception
-     */
-    abstract public function __construct($config);
 
 
     /**
