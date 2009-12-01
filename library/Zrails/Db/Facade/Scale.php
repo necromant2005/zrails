@@ -77,15 +77,9 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
      * @example new Core_Db_Adpater_Scale(array(
      *   'tables' => array(
      *     'table_name' => array(
-     *          'scale' => array(
-     *              'field' => 'field_name',
-     *              'strategy' => 'Core_Db_Adapter_Scale_Strategy'
-     *          )
-     *          'primary' => array(
-     *              'field' => 'field_name',
-     *              'autogenerate' => true,
-     *              'strategy' => 'Core_Db_Adapter_Scale_Primary_Generate_Strategy'
-     *          )
+     *         'field'        => 'field_name',
+     *         'strategy'     => 'Zrails_Db_Facade_Scale_Strategy_Crc32'
+     *         'key_provider' => 'Zrails_Db_Facade_Scale_Key_Provider_Random'
      *      )
      *
      *   ),
@@ -105,21 +99,19 @@ class Zrails_Db_Facade_Scale extends Zend_Db_Adapter_Abstract implements Iterato
         $this->_countShards = count($this->_shards);
 
         foreach ($options['tables'] as $table=>$table_options) {
-            $nameScaleStrategy = $table_options["scale"]["strategy"];
+            $nameScaleStrategy = $table_options["strategy"];
             Zend_Loader::loadClass($nameScaleStrategy);
             $Strategy = new $nameScaleStrategy($this);
             $Strategy->setTable($table);
-            $Strategy->setField($table_options["scale"]["field"]);
+            $Strategy->setField($table_options["field"]);
             $this->_tablesScaleStrategies[$table] = $Strategy;
 
-            if ($table_options["primary"]["autogenerate"]) {
-                $nameScaleKeyProvider = $table_options["primary"]["provider"];
-                Zend_Loader::loadClass($nameScaleKeyProvider);
-                $Strategy = new $nameScaleKeyProvider($this);
-                $Strategy->setTable($table);
-                $Strategy->setField($table_options["primary"]["field"]);
-                $this->_tablesScaleKeyProviders[$table] = $Strategy;
-            }
+            $nameScaleKeyProvider = $table_options["key_provider"];
+            Zend_Loader::loadClass($nameScaleKeyProvider);
+            $Strategy = new $nameScaleKeyProvider($this);
+            $Strategy->setTable($table);
+            $Strategy->setField($table_options["field"]);
+            $this->_tablesScaleKeyProviders[$table] = $Strategy;
         }
 
 

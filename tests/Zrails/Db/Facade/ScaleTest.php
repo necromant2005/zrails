@@ -18,15 +18,9 @@ class Zrails_Db_Facade_ScaleTest extends PHPUnit_Framework_TestCase
         $this->_db = new Zrails_Db_Facade_Scale(array(
             "tables" => array(
                 "users" => array(
-                    "scale"=> array(
-                        "field"    => "id",
-                        "strategy" => "Zrails_Db_Facade_Scale_Strategy_Crc32",
-                    ),
-                    "primary" => array(
-                        "field"        =>"id",
-                        "autogenerate" => true,
-                        "provider"     => "Zrails_Db_Facade_Scale_Key_Provider_Random"
-                     )
+                    "field"        => "id",
+                    "strategy"     => "Zrails_Db_Facade_Scale_Strategy_Crc32",
+                    "key_provider" => "Zrails_Db_Facade_Scale_Key_Provider_Random"
                 ),
             ),
             "shards" => array(
