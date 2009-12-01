@@ -24,14 +24,13 @@ class Zrails_Db_Facade_Scale_Key_Provider_Random extends Zrails_Db_Facade_Scale_
      */
     public function getUniqueId()
     {
-        $field = $this->_db->getScaleStrategy($this->_table)->getField();
         do {
             $uid = mt_rand();
             $dbSelect =
                 $this->_db
                 ->select()
                 ->from($this->_table)
-                ->where($this->_db->quoteInto("$field=?", $uid));
+                ->where($this->_db->quoteInto($this->_field . '=?', $uid));
         } while($this->_db->query("$dbSelect")->rowCount());
         return $uid;
     }

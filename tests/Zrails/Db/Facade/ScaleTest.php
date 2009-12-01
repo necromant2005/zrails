@@ -65,7 +65,7 @@ class Zrails_Db_Facade_ScaleTest extends PHPUnit_Framework_TestCase
     public function testGetScaleStrategyNonExists()
     {
         try {
-            $strategy = $this->_db->getScaleStrategy('users_non_exists');
+            $this->_db->getScaleStrategy('users_non_exists');
         } catch (Exception $e) {}
         $this->assertEquals(get_class($e), 'Zend_Db_Adapter_Exception');
     }
@@ -86,6 +86,28 @@ class Zrails_Db_Facade_ScaleTest extends PHPUnit_Framework_TestCase
         $config = $shard->getConfig();
         $this->assertEquals(get_class($shard), 'Zend_Db_Adapter_Pdo_Mysql');
         $this->assertEquals($config['dbname'], 'test0');
+    }
+
+    public function testGetKeyProvider()
+    {
+        $provider = $this->_db->getScaleKeyProvider('users');
+        $this->assertEquals(get_class($provider), 'Zrails_Db_Facade_Scale_Key_Provider_Random');
+        $this->assertEquals($provider->getField(), 'id');
+    }
+
+    public function testGetKeyProviderNonExists()
+    {
+        try {
+            $this->_db->getScaleKeyProvider('users_non_exists');
+        } catch (Exception $e) {}
+        $this->assertEquals(get_class($e), 'Zend_Db_Adapter_Exception');
+    }
+
+    public function testGetKeyProviderGenrateNewKey()
+    {
+        $provider = $this->_db->getScaleKeyProvider('users');
+        $id = $provider->getUniqueId();
+        $this->assertEquals(count($this->_users->find($id)), 0);
     }
 
     public function testInsertDbWithID()

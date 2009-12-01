@@ -35,11 +35,11 @@ abstract class Zrails_Db_Facade_Scale_Key_Provider_Abstract
     /**
      * Build strategy object
      *
-     * @param Core_Db_Adapter_Scale $Adapter
+     * @param Zrails_Db_Facade_Scale $db
      */
-    public function __construct(Core_Db_Adapter_Scale $Adapter)
+    public function __construct(Zrails_Db_Facade_Scale $db)
     {
-        $this->_Adapter = $Adapter;
+        $this->_db = $db;
     }
 
     /**

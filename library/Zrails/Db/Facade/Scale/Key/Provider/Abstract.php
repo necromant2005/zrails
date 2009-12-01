@@ -71,5 +71,12 @@ abstract class Zrails_Db_Facade_Scale_Key_Provider_Abstract
     {
         return $this->_field;
     }
+
+    /**
+     * Generate unique id for new row in table
+     *
+     * @return int|string
+     */
+    abstract public function getUniqueId();
 }
 
