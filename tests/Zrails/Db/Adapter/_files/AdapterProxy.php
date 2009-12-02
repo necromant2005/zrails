@@ -15,11 +15,10 @@ class AdapterProxy extends Zrails_Db_Adapter_Proxy_Abstract
 
     public function __call($method, $args)
     {
-        $this->_method = $method;
-        $this->_args   = $args;
+        return array($method=>$args);
     }
 
-    protected function _connect()
+    public function _connect()
     {
         return ;
     }
@@ -35,14 +34,40 @@ class AdapterProxy extends Zrails_Db_Adapter_Proxy_Abstract
         return ;
     }
 
-    public function getCallMethod()
+    public function _whereExpr($where)
     {
-        return $this->_method;
+        return parent::_whereExpr($where);
     }
 
-    public function getCallArgs()
+    public function _quote($value)
     {
-        return $this->_args;
+        return parent::_quote($value);
     }
+
+    public function _quoteIdentifierAs($ident, $alias = NULL, $auto = false, $as = ' AS ')
+    {
+        return parent::_quoteIdentifierAs($ident, $alias, $auto, $as);
+    }
+
+    public function _quoteIdentifier($value, $auto = false)
+    {
+        return parent::_quoteIdentifier($value, $auto);
+    }
+
+    public function _beginTransaction()
+    {
+        return parent::_beginTransaction();
+    }
+
+    public function _commit()
+    {
+        return parent::_commit();
+    }
+
+    public function _rollBack()
+    {
+        return parent::_rollBack();
+    }
+
 }
 
