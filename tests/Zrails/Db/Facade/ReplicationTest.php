@@ -117,5 +117,20 @@ class Zrails_Db_Facade_ReplicationTest extends PHPUnit_Framework_TestCase
         $this->db->connectSlave('slave1');
         $this->assertTrue($this->db->isSlaveConnection());
     }
+
+    public function testCloseConnection()
+    {
+        $this->assertNull($this->db->closeConnection());
+    }
+
+    public function testSetFetchMode()
+    {
+        $this->db->setFetchMode(Zend_Db::FETCH_NUM);
+        foreach ($this->db->getIterator() as $type=>$connections) {
+            foreach ($connections as $connection) {
+                $this->assertEquals($connection->getFetchMode(), Zend_Db::FETCH_NUM);
+            }
+        }
+    }
 }
 
