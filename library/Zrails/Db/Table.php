@@ -32,55 +32,150 @@ class Zrails_Db_Table extends Zend_Db_Table_Abstract
 {
     const REF_WHERE = "where";
 
+    /**
+     * Prefix of row classes
+     *
+     * @var string
+     */
     protected static $_rowClassPrefix = "Default_Model_";
 
-    protected $_name = "";
-
+    /**
+     * The primary key column or columns.
+     * A compound key should be declared as an array.
+     * You may declare a single-column primary key
+     * as a string.
+     *
+     * @var mixed
+     */
     protected $_primary = 'id';
 
+    /**
+     * Classname for row
+     *
+     * @var string
+     */
     protected $_rowClass = 'Zrails_Db_Table_Row';
 
+    /**
+     * Classname for rowset
+     *
+     * @var string
+     */
     protected $_rowsetClass = 'Zrails_Db_Table_Rowset';
 
+    /**
+     * Relationship for many to many dependence tables
+     *
+     * @var array
+     * @example array('Photos' => 'Photos_Tags')
+     */
     protected $_manyToManyTables = array();
 
-    /*=>array(
-        "NameOfField" => array(
-            "Type" => "text",
-            "Options" => array()
-        )
-    )*/
-    protected $_additional_fields = array();
+    /**
+     * Collectin of additional fields for form generator
+     *
+     * @var array
+     * @example
+     *  array(
+     *   "NameOfField" => array(
+     *       "Type" => "text",
+     *       "Options" => array()
+     * ))
+     */
+    protected $_additionalFormFields = array();
 
-
+    /**
+     * Get prefix of row classes
+     *
+     * @return string
+     */
     public static function getRowClassPrefix()
     {
         return self::$_rowClassPrefix;
     }
 
+    /**
+     * Set prefix of row classes
+     *
+     * @param string $prefix
+     * @return string
+     */
     public static function setRowClassPrefix($prefix)
     {
         return self::$_rowClassPrefix = $prefix;
     }
 
-
+    /**
+     * Initialize table and schema names.
+     *
+     * If the table name is not set in the class definition,
+     * use the class name itself as the table name.
+     *
+     * A schema name provided with the table name (e.g., "schema.table") overrides
+     * any existing value for $this->_schema.
+     *
+     * @return void
+     */
     protected function _setupTableName()
     {
         $this->_name = strtolower(str_replace(self::getRowClassPrefix(), '', get_class($this)));
     }
 
+    /**
+     * Fetches rows by primary key or create if cant found.  The argument specifies one or more primary
+     * key value(s).  To find multiple rows by primary key, the argument must
+     * be an array.
+     *
+     * This method accepts a variable number of arguments.  If the table has a
+     * multi-column primary key, the number of arguments must be the same as
+     * the number of columns in the primary key.  To find multiple rows in a
+     * table with a multi-column primary key, each argument must be an array
+     * with the same number of elements.
+     *
+     * The find() method always returns a Rowset object, even if only one row
+     * was found.
+     *
+     * @param  mixed $key The value(s) of the primary keys.
+     * @return Zrails_Db_Table_Row Row matching the criteria.
+     * @throws Zend_Db_Table_Exception
+     */
     public function findOrCreateRow($id)
     {
         if ($obj=$this->findRow($id)) return $obj;
         return $this->createRow();
     }
 
+    /**
+     * Fetches rows by primary key.  The argument specifies one or more primary
+     * key value(s).  To find multiple rows by primary key, the argument must
+     * be an array.
+     *
+     * This method accepts a variable number of arguments.  If the table has a
+     * multi-column primary key, the number of arguments must be the same as
+     * the number of columns in the primary key.  To find multiple rows in a
+     * table with a multi-column primary key, each argument must be an array
+     * with the same number of elements.
+     *
+     * The find() method always returns a Rowset object, even if only one row
+     * was found.
+     *
+     * @param  mixed $key The value(s) of the primary keys.
+     * @return Zrails_Db_Table_Row Row matching the criteria or Null.
+     * @throws Zend_Db_Table_Exception
+     */
     public function findRow($id)
     {
         return $this->find($id)->current();
     }
 
-    private function _calculationCountRows($where="")
+    /**
+     * Caclculate count rows by criteria
+     *
+     * @param  mixed $where array or string of matches the criteria.
+     * @return Zend_Db_Table_Rowset_Abstract Row(s) matching the criteria.
+     * @throws Zend_Db_Table_Exception
+     */
+    protected function _calculationCountRows($where="")
     {
         // selection tool
         $select = $this->_db->select();
@@ -135,16 +230,32 @@ class Zrails_Db_Table extends Zend_Db_Table_Abstract
         return $rows;
     }
 
+    /**
+     * Gets the metadata information returned by Zend_Db_Adapter_Abstract::describeTable().
+     *
+     * @return array
+     */
     public function getMetadata()
     {
         return $this->_metadata;
     }
 
+    /**
+     * Get many to many relationships for table
+     *
+     * @return array
+     */
     public function getManyToManyTables()
     {
         return $this->_manyToManyTables;
     }
 
+    /**
+     * Get reference by column name
+     *
+     * @param string $name
+     * @return array
+     */
     public function getReferenceByColumn($name)
     {
         foreach ($this->_referenceMap as $Model) {
@@ -157,14 +268,25 @@ class Zrails_Db_Table extends Zend_Db_Table_Abstract
         return null;
     }
 
+    /**
+     * Test reference by column name
+     *
+     * @param string $name
+     * @return bool
+     */
     public function hasReferenceByColumn($name)
     {
         return ($this->getReferenceByColumn($name)) ? true : false;
     }
 
+    /**
+     * Get array of additional fields for form builder
+     *
+     * @return array
+     */
     public function getAdditionalFields()
     {
-        return $this->_additional_fields;
+        return $this->_additionalFormFields;
     }
 }
 

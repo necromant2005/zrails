@@ -1,10 +1,10 @@
 <?php
 class Zrails_Db_Table_Rowset extends Zend_Db_Table_Rowset
 {
-    private $_page = 1;
-    private $_page_limit = 10;
-    private $_page_count = 10;
-    private $_page_count_pages = 10;
+    private $_currentPageNumber = 1;
+    private $_pageRange         = 1;
+    private $_itemCountPerPage  = 10;
+    private $_items             = 10;
 
     public function getTable()
     {
@@ -14,44 +14,44 @@ class Zrails_Db_Table_Rowset extends Zend_Db_Table_Rowset
     // SET
     public function setCurrentPageNumber($page)
     {
-        $this->_page = $page;
+        $this->_currentPageNumber = $page;
     }
 
     public function setPageRange($count)
     {
-        $this->_page_count_pages = $count;
+        $this->_pageRange = $count;
     }
 
     public function setItemCountPerPage($limit)
     {
-        $this->_page_limit = $limit;
+        $this->_itemCountPerPage = $limit;
     }
 
     public function setItems($count)
     {
-        $this->_page_count = $count;
+        $this->_items = $count;
     }
 
 
     // GET
     public function getCurrentPageNumber()
     {
-        return $this->_page;
+        return $this->_currentPageNumber;
     }
 
     public function getPageRange()
     {
-        return $this->_page_count_pages;
+        return $this->_pageRange;
     }
 
     public function getItemCountPerPage()
     {
-        return $this->_page_limit;
+        return $this->_itemCountPerPage;
     }
 
     public function getItems()
     {
-        return $this->_page_count;
+        return $this->_items;
     }
 
     /**
@@ -61,7 +61,7 @@ class Zrails_Db_Table_Rowset extends Zend_Db_Table_Rowset
      */
     public function isMoreThanOnePage()
     {
-          return ($this->_page_count_pages>1) ? true : false;
+          return ( $this->_pageRange > 1 ) ? true : false;
     }
 
     /**
