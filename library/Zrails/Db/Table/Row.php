@@ -1,6 +1,7 @@
 <?php
 class Zrails_Db_Table_Row extends Zend_Db_Table_Row
 {
+
     protected $_manyToManyData = array ( );
 
     public function isValid() {
@@ -455,6 +456,11 @@ class Zrails_Db_Table_Row extends Zend_Db_Table_Row
         throw new Exception("Can't find ViaClass to Class '$className'");
     }
 
+    /**
+     * Zend_Db_Table_Abstract parent class or instance.
+     *
+     * @return Zend_Db_Table_Abstract
+     */
     public function getTable() {
         return $this->_table;
     }

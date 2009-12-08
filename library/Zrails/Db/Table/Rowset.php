@@ -6,6 +6,11 @@ class Zrails_Db_Table_Rowset extends Zend_Db_Table_Rowset
     private $_itemCountPerPage  = 10;
     private $_items             = 10;
 
+    /**
+     * Zend_Db_Table_Abstract parent class or instance.
+     *
+     * @return Zend_Db_Table_Abstract
+     */
     public function getTable()
     {
         return $this->_table;
