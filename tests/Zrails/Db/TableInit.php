@@ -61,5 +61,10 @@ class Zrails_Db_TableInit extends PHPUnit_Framework_TestCase
         $this->categories = new Test_Model_Categories($this->db);
         $this->categoriesPhotos = new Test_Model_Categories_Photos($this->db);
     }
+
+    public function testEmpty()
+    {
+        $this->assertTrue(true);
+    }
 }
 

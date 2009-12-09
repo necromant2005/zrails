@@ -236,13 +236,31 @@ class Zrails_Db_TableTest extends Zrails_Db_TableInit
         $this->assertEquals($rowset->current()->id, 3);
     }
 
+    public function testDelete()
+    {
+        $category = $this->categories->createRow(array('name'=>'new'));
+        $category->save();
+        $id = $category->getId();
+        $rowset = $this->categories->fetchAll('id=' . $id);
+        $this->assertEquals(count($rowset), 1);
+        $this->assertEquals($rowset->current()->getId(), $id);
+        $category->delete();
+        $rowset = $this->categories->fetchAll('id=' . $id);
+        $this->assertEquals(count($rowset), 0);
+    }
+
     public function testDeleteWithDependency()
     {
         $category = $this->categories->findRow(1);
         $category->delete();
-
         $rowset = $this->categoriesPhotos->fetchAll('category_id=1');
         $this->assertEquals(count($rowset), 0);
+    }
+
+    public function testDeleteNonSave()
+    {
+        $category = $this->categories->createRow(array('name'=>'new'));
+        $category->delete();
     }
 }
 
