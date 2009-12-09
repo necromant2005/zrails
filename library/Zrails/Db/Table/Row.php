@@ -1,33 +1,82 @@
 <?php
+/**
+ ** @see Zrails_Db_Table_Row
+ */
+require_once 'Zend/Db/Table/Row.php';
+
+/**
+ ** @see Zrails_Db_Table_Row_Exception
+ */
+require_once 'Zend/Db/Table/Row/Exception.php';
+
+/**
+ * Class implement CRUD functionalty for db record
+ *
+ * @category   Zrails
+ * @package    Zrails_Db
+ * @subpackage Adapter
+ * @author     necromant2005@gmail.com
+ * @copyright  necromant2005 (http://necromant2005.blogspot.com/)
+ * @license    http://framework.zend.com/license/new-bsd     New BSD License
+ */
 class Zrails_Db_Table_Row extends Zend_Db_Table_Row
 {
 
+    /**
+     * Store many to many relationships data
+     *
+     * @var string
+     */
     protected $_manyToManyData = array ( );
 
+    /**
+     * Test is new object or saved in db
+     *
+     * @return bool
+     */
     public function isValid() {
         $key = (is_array($this->_primary)) ? reset($this->_primary) : $this->_primary;
         return ($this->$key) ? true : false;
     }
 
+    /**
+     * Test is new object or saved in db
+     *
+     * @return bool
+     */
     public function isNotValid() {
         return (! $this->isValid ()) ? true : false;
     }
 
+    /**
+     * Magic function for displaying object
+     *
+     * @return string
+     */
     public function __toString()
     {
         return $this->name;
     }
 
+    /**
+     * Get current object id
+     *
+     * @return int
+     */
     public function getId()
     {
         return $this->id;
     }
 
     /**
+     * Find many to many rowset for current object dependention
+     *
      * @param  string|Zend_Db_Table_Abstract  $matchTable
      * @param  string|Zend_Db_Table_Abstract  $intersectionTable
      * @param  string                         OPTIONAL $primaryRefRule
      * @param  string                         OPTIONAL $matchRefRule
+     * @param  string                         OPTIONAL $order
+     * @param  string                         OPTIONAL $where
      * @return Zend_Db_Table_Rowset_Abstract Query result from $matchTable
      * @throws Zend_Db_Table_Row_Exception If $matchTable or $intersectionTable is not a table class or is not loadable.
      */
@@ -119,10 +168,17 @@ class Zrails_Db_Table_Row extends Zend_Db_Table_Row
     }
 
     /**
+     * Find many to many rowset for current object dependention with pagination functionalty
+     *
      * @param  string|Zend_Db_Table_Abstract  $matchTable
      * @param  string|Zend_Db_Table_Abstract  $intersectionTable
      * @param  string                         OPTIONAL $primaryRefRule
      * @param  string                         OPTIONAL $matchRefRule
+     * @param  string                         OPTIONAL $order
+     * @param  int                            OPTIONAL $page
+     * @param  int                            OPTIONAL $limit
+     * @param  int                            OPTIONAL $count
+     * @param  string                         OPTIONAL $where
      * @return Zend_Db_Table_Rowset_Abstract Query result from $matchTable
      * @throws Zend_Db_Table_Row_Exception If $matchTable or $intersectionTable is not a table class or is not loadable.
      */
@@ -242,6 +298,10 @@ class Zrails_Db_Table_Row extends Zend_Db_Table_Row
      *
      * @param string|Zend_Db_Table_Abstract  $dependentTable
      * @param string                         OPTIONAL $ruleKey
+     * @param string                         OPTIONAL $order
+     * @param int                            OPTIONAL $offset
+     * @param int                            OPTIONAL $count
+     * @param string                         OPTIONAL $where
      * @return Zend_Db_Table_Rowset_Abstract Query result from $dependentTable
      * @throws Zend_Db_Table_Row_Exception If $dependentTable is not a table or is not loadable.
      */
@@ -288,6 +348,11 @@ class Zrails_Db_Table_Row extends Zend_Db_Table_Row
      *
      * @param string|Zend_Db_Table_Abstract  $dependentTable
      * @param string                         OPTIONAL $ruleKey
+     * @param string                         OPTIONAL $order
+     * @param int                            OPTIONAL $page
+     * @param int                            OPTIONAL $limit
+     * @param int                            OPTIONAL $count
+     * @param string                         OPTIONAL $where
      * @return Zend_Db_Table_Rowset_Abstract Query result from $dependentTable
      * @throws Zend_Db_Table_Row_Exception If $dependentTable is not a table or is not loadable.
      */
@@ -441,6 +506,12 @@ class Zrails_Db_Table_Row extends Zend_Db_Table_Row
         throw new Zend_Db_Table_Row_Exception ( "Unrecognized method '$method()'" );
     }
 
+    /**
+     * Get class name with prefix
+     *
+     * @param string $classname
+     * @return string
+     */
     protected function _getClassName($classname)
     {
         $prefix = Zrails_Db_Table::getRowClassPrefix();
@@ -448,12 +519,19 @@ class Zrails_Db_Table_Row extends Zend_Db_Table_Row
         return $prefix.$classname;
     }
 
+    /**
+     * Set prefix of row classes
+     *
+     * @param string $prefix
+     * @throws Zend_Db_Table_Row_Exception
+     * @return string
+     */
     protected function _getViaClassByClassForManyReference($className)
     {
         foreach ( $this->_table->getManyToManyTables () as $manyTable => $toManyTable ) {
             if ($className==$manyTable) return  $toManyTable;
         }
-        throw new Exception("Can't find ViaClass to Class '$className'");
+        throw new Zend_Db_Table_Row_Exception("Can't find ViaClass to Class '$className'");
     }
 
     /**
@@ -465,10 +543,21 @@ class Zrails_Db_Table_Row extends Zend_Db_Table_Row
         return $this->_table;
     }
 
+    /**
+     * Get additional fields for form builder
+     *
+     * @return array
+     */
     public function getAdditionalFields() {
         return $this->getTable ()->getAdditionalFields ();
     }
 
+    /**
+     * Sets all data in the row from an array.
+     *
+     * @param  array $data
+     * @return Zend_Db_Table_Row_Abstract Provides a fluent interface
+     */
     public function setFromArray($data) {
         $data_clear = array ( );
         foreach ( $this->_table->getMetadata () as $name => $value ) {
@@ -484,6 +573,15 @@ class Zrails_Db_Table_Row extends Zend_Db_Table_Row
         return parent::setFromArray ( $data_clear );
     }
 
+    /**
+     * Saves the properties to the database.
+     *
+     * This performs an intelligent insert/update, and reloads the
+     * properties with fresh data from the table on success.
+     *
+     * @return mixed The primary key value(s), as an associative array if the
+     *     key is compound, or a scalar if the key is single-column.
+     */
     public function save() {
         $return = parent::save ();
         foreach ( $this->_table->getManyToManyTables () as $manyTable => $toManyTable ) {
@@ -507,6 +605,11 @@ class Zrails_Db_Table_Row extends Zend_Db_Table_Row
         return $return;
     }
 
+    /**
+     * Deletes existing rows.
+     *
+     * @return int The number of rows deleted.
+     */
     public function delete() {
         foreach ( $this->_table->getManyToManyTables () as $manyTable => $toManyTable ) {
             $this->_manyToManyData [$manyTable] = array ( );
